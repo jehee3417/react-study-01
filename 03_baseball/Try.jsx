@@ -1,11 +1,15 @@
-import React from 'react';
+import React, {memo, useState} from 'react';
 
-const Try = ({v, i}) => {
+const Try = memo(({v, i}) => {
+  const [result, setResult] = useState(v.result);
+  const onClick = () => {
+    setResult('disappear')
+  }
   return (
     <li>
-      <div>{i + 1}회: {v.try} - {v.result}</div>
+      <div onClick={onClick}>{i + 1}회: {v.try} - {result}</div>
     </li>
   )
-}
+})
 
 export default Try;

@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, memo} from 'react';
 import Try from './Try';
 
-function getNumbers() {
+const getNumbers = () => {
   const candidate = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const array = [];
   for (let i = 0; i < 4; i++) {
@@ -11,7 +11,7 @@ function getNumbers() {
   return array;
 }
 
-const Baseball = () => {
+const Baseball = memo(() => {
   const [result, setResult] = useState('');
   const [value, setValue] = useState('');
   const [answer, setAnswer] = useState(getNumbers());
@@ -70,7 +70,7 @@ const Baseball = () => {
       </ul>
     </>
   )
-}
+})
 
 import { hot } from 'react-hot-loader/root';
 export default hot(Baseball);
