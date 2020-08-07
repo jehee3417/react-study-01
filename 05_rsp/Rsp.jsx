@@ -1,8 +1,5 @@
-import React, { Component } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-// 클래스의 경우 -> constructor -> render -> ref -> componentDidMount
-// (setState/props 바뀔때) -> shouldComponentUpdate(true) -> render -> componentDidUpdate
-// 부모가 나를 없앴을 때 -> componentWillUnmount -> 소멸
 
 const rspCoords = {
   rock: '0px'
@@ -11,8 +8,8 @@ const rspCoords = {
 }
 
 const scores = {
-  rock: 1
-  , scissor: 0
+   rock: 0
+   , scissor: 1
   , paper: -1
 }
 const computerChoice = (imgCoord) => {
@@ -21,86 +18,67 @@ const computerChoice = (imgCoord) => {
   })[0];
 }
 
-class Rsp extends Component {
-  state = {
-    result: ''
-    , imgCoord: rspCoords.rock
-    , score: 0
-  };
+const Rsp = () => {
+  const [result, setResult] =  useState('');
+  const [imgCoord, setImgCoord] = useState(rspCoords.rock);
+  const [score, setScore] = useState(0);
+  const interval = useRef(null);
 
-  interval;
+  useEffect(() => { 
+    //componentDidMount
+    //ComponentDidUpdate
+    interval.current = setInterval(changeHand, 100);
+    return () => {
+      //componentWillUnmount
+      clearInterval(interval.current);
+    }
+  }, [imgCoord])
 
-  componentDidMount() {
-    this.interval = setInterval(this.changeHand, 30);
-  }
-
-  componentWillUnmount() { 
-    clearInterval(this.interval);
-  }
-
-  changeHand = () => {
-    const {imgCoord} = this.state;
+  const changeHand = () => {
     if (imgCoord === rspCoords.rock) {
-      this.setState({
-        imgCoord: rspCoords.scissor
-      });
+      setImgCoord(rspCoords.scissor);
     } else if (imgCoord === rspCoords.scissor) {
-      this.setState({
-        imgCoord: rspCoords.paper
-      });
+      setImgCoord(rspCoords.paper);
     } else if (imgCoord === rspCoords.paper) {
-      this.setState({
-        imgCoord: rspCoords.rock
-      });
+      setImgCoord(rspCoords.rock);
     }
   }
 
-  onClickBtn = (choice) => () => {
-    const {imgCoord} = this.state;
-    clearInterval(this.interval);
+  const onClickBtn = (choice) => () => {
+    clearInterval(interval.current);
     const myScore = scores[choice];
     const cpuScore = scores[computerChoice(imgCoord)];
     const diff = myScore - cpuScore;
     if (diff === 0) {
-      this.setState({
-        result: 'Draw!',
-      });
+      setResult('Draw!');
     } else if ([-1, 2].includes(diff)) {
-      this.setState((prevState) => {
-        return {
-          result: 'Win!',
-          score: prevState.score + 1,
-        };
+      setResult('Win!');
+      setScore((prevScore) => {
+        return prevScore + 1
       });
     } else {
-      this.setState((prevState) => {
-        return {
-          result: 'Lose!',
-          score: prevState.score - 1,
-        };
-      });
+      setResult('Lose!');
+      setScore((prevScore) => {
+        return prevScore - 1;
+      })
     }
     setTimeout(() => {
-      this.interval = setInterval(this.changeHand, 30);
+      interval.current = setInterval(changeHand, 100);
     }, 500);
   };
 
-  render() {
-    const { result, score, imgCoord } = this.state;
-    return (
-      <>
-        <div id="computer" style={{ background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0` }} />
-        <div>
-          <button id="rock" className="btn" onClick={this.onClickBtn('rock')}>Rack</button>
-          <button id="scissor" className="btn" onClick={this.onClickBtn('scissor')}>Scissor</button>
-          <button id="paper" className="btn" onClick={this.onClickBtn('paper')}>Paper</button>
-        </div>
-        <div>{result}</div>
-        <div>SCORE: {score}pt</div>
-      </>
-    );
-  }
+  return (
+    <>
+    <div id="computer" style={{ background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0` }} />
+    <div>
+      <button id="rock" className="btn" onClick={onClickBtn('rock')}>Rack</button>
+      <button id="scissor" className="btn" onClick={onClickBtn('scissor')}>Scissor</button>
+      <button id="paper" className="btn" onClick={onClickBtn('paper')}>Paper</button>
+    </div>
+    <div>{result}</div>
+    <div>SCORE: {score}pt</div>
+  </>
+  );
+
 }
-
-
 export default Rsp;
