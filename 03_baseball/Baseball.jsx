@@ -72,6 +72,6 @@ const Baseball = memo(() => {
   )
 })
 
-import { hot } from 'react-hot-loader/root';
-export default hot(Baseball);
+// import { hot } from 'react-hot-loader/root';
+export default Baseball;
  
